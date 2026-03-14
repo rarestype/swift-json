@@ -1,11 +1,13 @@
 public import JSON
 
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
 @frozen public struct JSValue {
     @usableFromInline let storage: Storage
     @inlinable init(storage: Storage) {
         self.storage = storage
     }
 }
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
 extension JSValue {
     @inlinable public static func boolean(_ value: Bool) -> Self {
         .init(storage: .boolean(value))
@@ -32,6 +34,7 @@ extension JSValue {
         .init(storage: .bigInt(value))
     }
 }
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
 extension JSValue: JSONEncodable {
     public func encode(to json: inout JSON) {
         switch self.storage {
@@ -67,6 +70,7 @@ extension JSValue: JSONEncodable {
         }
     }
 }
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
 extension JSValue: JSONDecodable {
     public init(json: borrowing JSON.Node) throws {
         switch json {
@@ -106,6 +110,7 @@ extension JSValue: JSONDecodable {
         }
     }
 }
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
 extension JSValue {
     private static func number(_ int128: Int128) -> JSValue {
         if  let double: Double = .init(exactly: int128) {
@@ -123,12 +128,15 @@ extension JSValue {
         }
     }
 }
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
 extension JSValue: ConstructibleFromJSValue {
     @inlinable public static func construct(from value: JSValue) -> Self? { value }
 }
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
 extension JSValue: ConvertibleToJSValue {
     @inlinable public var jsValue: JSValue { self }
 }
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
 extension JSValue {
     @inlinable public var number: Double? {
         guard case .number(let value) = self.storage else {
@@ -144,6 +152,7 @@ extension JSValue {
         return value
     }
 }
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
 extension JSValue {
     @inlinable public var jsString: JSString? {
         guard case .string(let value) = self.storage else {
@@ -152,6 +161,7 @@ extension JSValue {
         return value
     }
 }
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
 extension JSValue {
     @inlinable public var boolean: Bool? {
         guard case .boolean(let value) = self.storage else {
