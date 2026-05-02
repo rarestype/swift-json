@@ -9,7 +9,7 @@ let package: Package = .init(
     ],
     dependencies: [
         .package(url: "https://github.com/ordo-one/dollup", from: "1.0.1"),
-        .package(url: "https://github.com/rarestype/swift-io", from: "1.2.0"),
+        .package(url: "https://github.com/rarestype/swift-io", from: "3.0.0"),
         .package(path: ".."),
     ],
     targets: [
