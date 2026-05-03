@@ -24,6 +24,7 @@ import Testing
         try Self.decode(Int64.min, to: Int64.self)
     }
 
+    @available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
     @Test static func AsInt128Inline() throws {
         let field: JSON.FieldDecoder<Never?> = .init(
             key: nil,
@@ -32,9 +33,11 @@ import Testing
 
         #expect(try field.decode() == -Int128.init(UInt64.max))
     }
+    @available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
     @Test static func AsInt128Min() throws {
         try Self.decode(Int128.min, to: Int128.self)
     }
+    @available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
     @Test static func AsInt128Max() throws {
         try Self.decode(Int128.max, to: Int128.self)
     }
@@ -62,9 +65,11 @@ import Testing
         try Self.decode(UInt64.max, to: UInt64.self)
     }
 
+    @available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
     @Test static func AsUInt128() throws {
         try Self.decode(256, to: UInt128.self)
     }
+    @available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
     @Test static func AsUInt128Max() throws {
         try Self.decode(UInt128.max, to: UInt128.self)
     }
