@@ -105,7 +105,7 @@ jobs:
 
             -   name: 🩵 Install profiling libraries 🩵
                 run: |
-                    apt install -y \
+                    sudo apt install -y \
                         libbabeltrace-dev \
                         libelf-dev \
                         libdw1 \
@@ -118,7 +118,7 @@ jobs:
                     archive: perf.tar.gz
 
             -   name: 🩵 Enable performance counters 🩵
-                run: sysctl -w kernel.perf_event_paranoid=-1
+                run: sudo sysctl -w kernel.perf_event_paranoid=-1
 
             -   name: 🩵 Checkout repository 🩵
                 uses: actions/checkout@v6
