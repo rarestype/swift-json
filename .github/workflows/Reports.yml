@@ -1,0 +1,66 @@
+name: Reports
+
+on:
+    workflow_run:
+        workflows: ["Tests"]
+        types:
+            - completed
+
+permissions:
+    pull-requests: write
+
+jobs:
+    benchmarks:
+        runs-on: ubuntu-latest
+        if: >
+            github.event.workflow_run.event == 'pull_request' &&
+            github.event.workflow_run.conclusion == 'success'
+        steps:
+            -   name: 🩵 Find PR Number by Fork Branch 🩵
+                id: pr
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    HEAD_OWNER: ${{ github.event.workflow_run.head_repository.owner.login }}
+                    HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+                run: |
+                    PR_QUERY="repos/${{ github.repository }}/pulls?\
+                    state=all&head=${HEAD_OWNER}:${HEAD_BRANCH}"
+
+                    PR=$(gh api "$PR_QUERY" --jq '.[0].number')
+
+                    if [ "$PR" == "null" ] || [ -z "$PR" ]; then
+                        echo "Error: Could not find PR for this branch."
+                        exit 1
+                    fi
+
+                    echo "id=${PR}" >> "$GITHUB_OUTPUT"
+
+            -   name: 🩵 Download benchmark timing artifacts 🩵
+                uses: actions/download-artifact@v8
+                with:
+                    run-id: ${{ github.event.workflow_run.id }}
+                    github-token: ${{ secrets.GITHUB_TOKEN }}
+
+            -   name: 🩵 Generate notes 🩵
+                run: |
+                    summary=$(
+                        echo "| architecture | subject | benchmark duration |"
+                        echo "| ------------ | ------- | ------------------ |"
+                        for arch in x86_64 aarch64; do
+                            for id in "Swift.symbols.json"; do
+                                timing="timings-${arch}/${id}.duration"
+                                if [ -f "$timing" ]; then
+                                    echo "| ${arch} | ${id} | $(cat "$timing") |"
+                                fi
+                            done
+                        done
+                    )
+                    echo "$summary" >> "$GITHUB_STEP_SUMMARY"
+                    echo "$summary" >> summary_benchmark.md
+
+            -   name: 🩵 Publish PR comment 🩵
+                uses: marocchino/sticky-pull-request-comment@v3
+                with:
+                    header: benchmark-results
+                    path: summary_benchmark.md
+                    number: ${{ steps.pr.outputs.id }}

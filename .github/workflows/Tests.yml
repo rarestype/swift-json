@@ -116,33 +116,3 @@ jobs:
                     path: '*.duration'
                     retention-days: 1
                     compression-level: 0
-
-    benchmarks-collate:
-        runs-on: ubuntu-latest
-        name: Benchmark
-        needs: benchmarks
-        steps:
-            -   name: 🩵 Download benchmark timing (x86_64) 🩵
-                uses: actions/download-artifact@v8
-
-            -   name: 🩵 Generate notes 🩵
-                run: |
-                    ls -l .
-                    summary=$(
-                        echo "| architecture | subject | benchmark duration |"
-                        echo "| ------------ | ------- | ------------------ |"
-                        for arch in x86_64 aarch64; do
-                            for id in "Swift.symbols.json"; do
-                                timing="timings-${arch}/${id}.duration"
-                                echo "| ${arch} | ${id} | $(cat "$timing") |"
-                            done
-                        done
-                    )
-                    echo "$summary" >> "$GITHUB_STEP_SUMMARY"
-                    echo "$summary" >> "summary_benchmark.md"
-
-            -   name: 🩵 Publish PR comment 🩵
-                uses: marocchino/sticky-pull-request-comment@v3
-                with:
-                    header: benchmark-results
-                    path: summary_benchmark.md
