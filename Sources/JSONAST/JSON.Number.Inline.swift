@@ -76,8 +76,8 @@ extension JSON.Number.Inline {
                 return T.init(exactly: negated)
             }
 
-            // slow path, underflow occured
-            if  T.bitWidth > 64 {
+            // slow path, underflow occurred
+            if  T.bitWidth > 64, #available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) {
                 return T.init(exactly: -Int128.init(self.units))
             } else {
                 return nil
@@ -102,6 +102,7 @@ extension JSON.Number.Inline {
                 return (units: units, places: places)
             }
             if  T.bitWidth > 64,
+               #available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *),
                 let units: T = .init(exactly: -Int128.init(self.units)) {
                 return (units: units, places: places)
             } else {

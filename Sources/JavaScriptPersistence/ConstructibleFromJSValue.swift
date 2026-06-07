@@ -1,6 +1,8 @@
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
 public protocol ConstructibleFromJSValue {
     static func construct(from value: JSValue) -> Self?
 }
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
 extension ConstructibleFromJSValue where Self: SignedInteger {
     @inlinable public static func construct(from value: JSValue) -> Self? {
         switch value.storage {
@@ -10,6 +12,7 @@ extension ConstructibleFromJSValue where Self: SignedInteger {
         }
     }
 }
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
 extension ConstructibleFromJSValue where Self: UnsignedInteger {
     @inlinable public static func construct(from value: JSValue) -> Self? {
         switch value.storage {

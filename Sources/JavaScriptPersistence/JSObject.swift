@@ -1,5 +1,6 @@
 public import JSON
 
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
 public final class JSObject {
     @usableFromInline var object: [String: JSValue]
     @usableFromInline var buffer: [JSValue]
@@ -11,6 +12,7 @@ public final class JSObject {
         self.isArray = isArray
     }
 }
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
 extension JSObject {
     @inlinable convenience public init(object: [String: JSValue]) {
         self.init(object: object, buffer: [], isArray: false)
@@ -19,6 +21,7 @@ extension JSObject {
         self.init(object: [:], buffer: buffer, isArray: true)
     }
 }
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
 extension JSObject {
     private convenience init(json: borrowing JSON.Object) throws {
         var object: [String: JSValue] = .init(minimumCapacity: json.fields.count)
@@ -34,6 +37,7 @@ extension JSObject {
         self.init(buffer: try json.elements.map(JSValue.init(json:)))
     }
 }
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
 extension JSObject {
     @inlinable public static func object(_ properties: [String: JSValue] = [:]) -> JSObject {
         .init(object: properties)
@@ -45,18 +49,22 @@ extension JSObject {
     public static func json(_ json: JSON.Object) throws -> JSObject { try .init(json: json) }
     public static func json(_ json: JSON.Array) throws -> JSObject { try .init(json: json) }
 }
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
 extension JSObject: ConvertibleToJSValue {
     @inlinable public var jsValue: JSValue { .object(self) }
 }
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
 extension JSObject: ConstructibleFromJSValue {
     @inlinable public static func construct(from value: JSValue) -> JSObject? { value.object }
 }
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
 extension JSObject {
     @inlinable public var properties: [String: JSValue] { self.object }
     @inlinable public func push(_ value: JSValue) {
         self.buffer.append(value)
     }
 }
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
 extension JSObject {
     @inlinable public subscript(index: Int) -> JSValue {
         get {
@@ -103,6 +111,7 @@ extension JSObject {
         }
     }
 }
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
 extension JSObject: JSONEncodable {
     public func encode(to json: inout JSON) {
         if  self.isArray {
@@ -118,6 +127,7 @@ extension JSObject: JSONEncodable {
         }
     }
 }
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
 extension JSObject: JSONDecodable {
     public convenience init(json: borrowing JSON.Node) throws {
         switch json {
