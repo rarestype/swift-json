@@ -47,6 +47,9 @@ jobs:
             -   name: 💖 Run tests 💖
                 run: Scripts/TestAll
 
+            -   name: 💖 Package (dry run) 💖
+                run: Scripts/Package
+
             -   name: 💖 Update badge 💖
                 uses: rarestype/rarestbadge@v1
                 if: always()
@@ -64,6 +67,9 @@ jobs:
 
             -   name: 💖 Run tests 💖
                 run: Scripts/TestAll
+
+            -   name: 💖 Package (dry run) 💖
+                run: Scripts/Package
 
             -   name: 💖 Update badge 💖
                 uses: rarestype/rarestbadge@v1
