@@ -17,36 +17,7 @@ on:
                 type: string
 
 jobs:
-    macOS:
-        runs-on: macos-26
-        env:
-            DEPLOY_VERSION: ${{ inputs.version }}
-        steps:
-            -   name: 💝 Setup R2 💝
-                uses: rarestype/r2-setup-action@v1
-                with:
-                    cloudflare-account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-                    r2-access-key-id: ${{ secrets.R2_ACCESS_KEY }}
-                    r2-access-key: ${{ secrets.R2_ACCESS_SECRET }}
-
-            -   name: 💝 Checkout repository 💝
-                uses: actions/checkout@v6
-
-            -   name: 💝 Select Xcode 26.5 💝
-                run: sudo xcode-select -s /Applications/Xcode_26.5.app/Contents/Developer
-
-            -   name: 💝 Build for distribution 💝
-                run: Scripts/Package
-
-            -   name: 💝 Deploy prebuilts 💝
-                uses: rarestype/r2-release-action@v1
-                with:
-                    from: .build/xcframeworks_
-                    include: JSON.xcframework
-                    archive: JSON.xcframework.zip
-                    version: ${{ inputs.version }}
-                    bucket: rarest
-    Linux:
+    build:
         strategy:
             matrix:
                 runner:
@@ -55,6 +26,9 @@ jobs:
 
                     -   name: "Ubuntu (aarch64)"
                         id: ubuntu-24.04-arm
+
+                    -   name: "macOS"
+                        id: macos-26
 
         runs-on: "${{ matrix.runner.id }}"
         name: "${{ matrix.runner.name }}"
@@ -72,9 +46,14 @@ jobs:
                 uses: actions/checkout@v6
 
             -   name: 💝 Install Swift 💝
+                if: runner.os != 'macOS'
                 uses: rarestype/swift-install-action@v1
                 with:
                     swift-release: 6.3.2-RELEASE
+
+            -   name: 💝 Select Xcode 26.5 💝
+                if: runner.os == 'macOS'
+                run: sudo xcode-select -s /Applications/Xcode_26.5.app/Contents/Developer
 
             -   name: 💝 Build for distribution 💝
                 run: Scripts/Package
@@ -83,13 +62,18 @@ jobs:
                 uses: rarestype/r2-release-action@v1
                 with:
                     from: .build/xcframeworks_
-                    include: JSON.xcframework
-                    archive: JSON.xcframework.zip
+                    each: zip
+                    include: |
+                        JSONAST.xcframework
+                        JSONDecoding.xcframework
+                        JSONEncoding.xcframework
+                        JSONParsing.xcframework
+                        JSON.xcframework
                     version: ${{ inputs.version }}
                     bucket: rarest
 
     release:
-        needs: [macOS, Linux]
+        needs: [build]
         runs-on: macos-26
         name: Release
         env:
@@ -106,35 +90,52 @@ jobs:
                 run: |
                     HOST="https://get.rarestype.com/swift-json/$DEPLOY_VERSION"
 
-                    BUNDLE_URL_LINUX_AARCH64="$HOST/Linux-aarch64/JSON.xcframework.zip"
-                    BUNDLE_URL_LINUX_X86_64="$HOST/Linux-x86_64/JSON.xcframework.zip"
-                    BUNDLE_URL_MACOS_ARM64="$HOST/macOS-arm64/JSON.xcframework.zip"
-
-                    echo "macOS Bundle URL: ${BUNDLE_URL_MACOS_ARM64}"
-                    echo "Linux Bundle URL (x86_64): ${BUNDLE_URL_LINUX_X86_64}"
-                    echo "Linux Bundle URL (aarch64): ${BUNDLE_URL_LINUX_AARCH64}"
-
-                    curl "$BUNDLE_URL_LINUX_AARCH64" -o Linux-aarch64.zip
-                    curl "$BUNDLE_URL_LINUX_X86_64" -o Linux-x86_64.zip
-                    curl "$BUNDLE_URL_MACOS_ARM64" -o macOS-arm64.zip
-
-                    CHECKSUM_LINUX_AARCH64=$(swift package compute-checksum Linux-aarch64.zip)
-                    CHECKSUM_LINUX_X86_64=$(swift package compute-checksum Linux-x86_64.zip)
-                    CHECKSUM_MACOS_ARM64=$(swift package compute-checksum macOS-arm64.zip)
-
-                    echo "macOS Checksum: ${CHECKSUM_MACOS_ARM64}"
-                    echo "Linux Checksum (x86_64): ${CHECKSUM_LINUX_X86_64}"
-                    echo "Linux Checksum (aarch64): ${CHECKSUM_LINUX_AARCH64}"
-
                     cd downstream
+                    cp -f Modules.swift Package.swift
 
-                    sed -e "s/__CHECKSUM_MACOS__/${CHECKSUM_MACOS_ARM64}/g" \
-                        -e "s/__CHECKSUM_LINUX_X86_64__/${CHECKSUM_LINUX_X86_64}/g" \
-                        -e "s/__CHECKSUM_LINUX_AARCH64__/${CHECKSUM_LINUX_AARCH64}/g" \
-                        -e "s|__BUNDLE_URL_MACOS__|${BUNDLE_URL_MACOS_ARM64}|g" \
-                        -e "s|__BUNDLE_URL_LINUX_X86_64__|${BUNDLE_URL_LINUX_X86_64}|g" \
-                        -e "s|__BUNDLE_URL_LINUX_AARCH64__|${BUNDLE_URL_LINUX_AARCH64}|g" \
-                        Package.template.swift > Package.swift
+                    checksum() {
+                        swift package compute-checksum $1
+                    }
+
+                    modules=(
+                        'JSONAST'
+                        'JSONDecoding'
+                        'JSONEncoding'
+                        'JSONParsing'
+                        'JSON'
+                    )
+                    for module in "${modules[@]}"; do
+                        BUNDLE_URL_LINUX_AARCH64="$HOST/Linux-aarch64/${module}.xcframework.zip"
+                        BUNDLE_URL_LINUX_X86_64="$HOST/Linux-x86_64/${module}.xcframework.zip"
+                        BUNDLE_URL_MACOS_ARM64="$HOST/macOS-arm64/${module}.xcframework.zip"
+
+                        echo "macOS Bundle URL: ${BUNDLE_URL_MACOS_ARM64}"
+                        echo "Linux Bundle URL (x86_64): ${BUNDLE_URL_LINUX_X86_64}"
+                        echo "Linux Bundle URL (aarch64): ${BUNDLE_URL_LINUX_AARCH64}"
+
+                        curl "$BUNDLE_URL_LINUX_AARCH64" -o Linux-aarch64.zip
+                        curl "$BUNDLE_URL_LINUX_X86_64" -o Linux-x86_64.zip
+                        curl "$BUNDLE_URL_MACOS_ARM64" -o macOS-arm64.zip
+
+                        CHECKSUM_LINUX_AARCH64=$(checksum Linux-aarch64.zip)
+                        CHECKSUM_LINUX_X86_64=$(checksum Linux-x86_64.zip)
+                        CHECKSUM_MACOS_ARM64=$(checksum macOS-arm64.zip)
+
+                        echo "macOS Checksum: ${CHECKSUM_MACOS_ARM64}"
+                        echo "Linux Checksum (x86_64): ${CHECKSUM_LINUX_X86_64}"
+                        echo "Linux Checksum (aarch64): ${CHECKSUM_LINUX_AARCH64}"
+
+                        sed -e "s/__MODULE__/${module}/g" \
+                            -e "s/__CHECKSUM_MACOS__/${CHECKSUM_MACOS_ARM64}/g" \
+                            -e "s/__CHECKSUM_LINUX_X86_64__/${CHECKSUM_LINUX_X86_64}/g" \
+                            -e "s/__CHECKSUM_LINUX_AARCH64__/${CHECKSUM_LINUX_AARCH64}/g" \
+                            -e "s|__BUNDLE_URL_MACOS__|${BUNDLE_URL_MACOS_ARM64}|g" \
+                            -e "s|__BUNDLE_URL_LINUX_X86_64__|${BUNDLE_URL_LINUX_X86_64}|g" \
+                            -e "s|__BUNDLE_URL_LINUX_AARCH64__|${BUNDLE_URL_LINUX_AARCH64}|g" \
+                            Module.swift >> Package.swift
+
+                        rm *.zip
+                    done
 
                     git config user.name "rarest automation"
                     git config user.email "automation@noreply.rarestype.com"

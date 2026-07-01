@@ -6,10 +6,16 @@ let package: Package = .init(
     name: "swift-json",
     platforms: [.macOS(.v10_15), .iOS(.v13), .tvOS(.v13), .watchOS(.v6), .visionOS(.v1)],
     products: [
+        "JSONAST",
+        "JSONDecoding",
+        "JSONEncoding",
+        "JSONParsing",
+        "JSON",
+    ].map {
+        .library(name: $0, type: BuildLibraryAsBinary ? .dynamic : nil, targets: [$0])
+    } + [
         .library(name: "JavaScriptPersistence", targets: ["JavaScriptPersistence"]),
         .library(name: "JQ", targets: ["JQ"]),
-        .library(name: "JSON", type: BuildLibraryAsBinary ? .dynamic : nil, targets: ["JSON"]),
-        .library(name: "JSONAST", targets: ["JSONAST"]),
         .library(name: "JSONLegacy", targets: ["JSONLegacy"]),
 
         .library(name: "_JSON_SnippetsAnchor", targets: ["_JSON_SnippetsAnchor"]),
@@ -131,6 +137,7 @@ package.targets = package.targets.map {
 
         settings.append(.enableUpcomingFeature("ExistentialAny"))
         settings.append(.enableUpcomingFeature("InternalImportsByDefault"))
+        settings.append(.enableUpcomingFeature("MemberImportVisibility"))
 
         if  WarningsAsErrors {
             settings.append(.treatWarning("ExistentialAny", as: .error))
@@ -140,6 +147,8 @@ package.targets = package.targets.map {
             settings.append(
                 .unsafeFlags(["-enable-library-evolution", "-emit-module-interface"])
             )
+        } else {
+            settings.append(.define("CANEXPOSE_TraceableErrors"))
         }
 
         $0 = settings
