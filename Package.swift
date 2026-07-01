@@ -146,11 +146,12 @@ package.targets = package.targets.map {
         if  BuildLibraryAsBinary {
             // we can also pass these via `-Xswiftc`, but then `swiftdoc` and `swiftinterface`
             // will be in different locations, which makes packaging less convenient
-            #if !os(macOS)
             settings.append(
-                .unsafeFlags(["-enable-library-evolution", "-emit-module-interface"])
+                .unsafeFlags(
+                    ["-enable-library-evolution", "-emit-module-interface"],
+                    .when(platforms: [.linux])
+                )
             )
-            #endif
         } else {
             settings.append(.define("CANEXPOSE_TraceableErrors"))
         }
