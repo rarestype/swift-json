@@ -112,6 +112,21 @@ var WarningsAsErrors: Bool {
     default: false
     }
 }
+var BuildLibraryAsBinary: Bool {
+    switch ProcessInfo.processInfo.environment["BUILD_LIBRARY_AS_BINARY"] {
+    case "true"?: true
+    case "1"?: true
+    default: false
+    }
+}
+
+package.products = package.products.map {
+    if case let library as Product.Library = $0, BuildLibraryAsBinary {
+        return .library(name: $0.name, type: .dynamic, targets: library.targets)
+    } else {
+        return $0
+    }
+}
 package.targets = package.targets.map {
     switch $0.type {
     case .plugin: return $0
