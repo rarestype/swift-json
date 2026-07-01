@@ -100,7 +100,7 @@ build_macOS() {
             # if building for local development, include sourcemaps
             local sourceinfo_prefix="${ArchiveIntermediates}/${BUILD_ANCHOR}/IntermediateBuildFilesPath"
             local sourceinfo="/Release/${product}.build/Objects-normal/arm64/${product}.swiftsourceinfo"
-            local sourceinfo=("${sourceinfo_prefix}"/*.build/"$sourceinfo")
+            local sourceinfo=("${sourceinfo_prefix}"/*.build"$sourceinfo")
             local sourceinfo="${sourceinfo[0]}"
             if [[ -f "$sourceinfo" && "$BUILD_LOCAL" == 'true' ]]; then
                 cp "$sourceinfo" "${Modules}/${product}.swiftsourceinfo"
