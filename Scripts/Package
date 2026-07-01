@@ -45,19 +45,36 @@ build_linux() {
         local contents="${xcframework}/linux-$(uname -m)"
         mkdir -p "$contents/Modules"
 
-        for file in \
-            "Modules/${product}.swiftinterface" \
-            "Modules/${product}.swiftdoc" \
-            "lib${product}.so"; do
-            if [[ ! -f "${release}/${file}" ]]; then
-                echo "Error: ${file} not found in build output"
-                exit 1
+        local modules=()
+        for swiftinterface in "${release}"/*.build/*.swiftinterface; do
+            local module_name="${swiftinterface##*/}"
+            if [[ "$module_name" == *.*.swiftinterface ]]; then
+                # private or package swiftinterface
+                continue
             fi
-
-            cp -f "${release}/${file}" "${contents}/${file}"
+            modules+=("${module_name%.swiftinterface}")
         done
 
-        chmod +x "${contents}/lib${product}.so"
+        echo "discovered modules: ${modules[*]}"
+
+        local library="lib${product}.so"
+        if [[ ! -f "${release}/${library}" ]]; then
+            echo "Error: ${library} not found in build output"
+            exit 1
+        fi
+
+        cp -f "${release}/${library}" "${contents}/${library}"
+
+        for module in "${modules[@]}"; do
+            for resource in 'swiftinterface' 'swiftdoc'; do
+                local file="${module}.${resource}"
+                if [[ -f "${release}/${file}" ]]; then
+                    cp -f "${release}/${file}" "${contents}/Modules/${file}"
+                fi
+            done
+        done
+
+        chmod +x "${contents}/${library}"
 
         cat Scripts/Info.plist.template | \
         sed \
