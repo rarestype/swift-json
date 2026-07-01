@@ -43,7 +43,7 @@ build_linux() {
     for product in "${products[@]}"; do
         local xcframework="${BUILD_XCFRAMEWORKS_DESTINATION}/${product}.xcframework"
         local contents="${xcframework}/linux-$(uname -m)"
-        mkdir -p "$contents/Modules"
+        mkdir -p "$contents"
 
         local modules=()
         for swiftinterface in "${release}"/*.build/*.swiftinterface; do
@@ -66,10 +66,12 @@ build_linux() {
         cp -f "${release}/${library}" "${contents}/${library}"
 
         for module in "${modules[@]}"; do
+            local swiftmodule="${contents}/Modules/${module}.swiftmodule"
+            mkdir -p "$swiftmodule"
             for resource in 'swiftinterface' 'swiftdoc'; do
                 local file="${module}.${resource}"
-                if [[ -f "${release}/${file}" ]]; then
-                    cp -f "${release}/${file}" "${contents}/Modules/${file}"
+                if [[ -f "${release}/${module}.build/${file}" ]]; then
+                    cp -f "${release}/${module}.build/${file}" "${swiftmodule}/${file}"
                 fi
             done
         done
