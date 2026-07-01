@@ -144,7 +144,9 @@ package.targets = package.targets.map {
             settings.append(.treatWarning("MutableGlobalVariable", as: .error))
         }
         if  BuildLibraryAsBinary {
-            settings.append(.unsafeFlags(["-emit-module-interface"]))
+            settings.append(
+                .unsafeFlags(["-enable-library-evolution", "-emit-module-interface"])
+            )
         }
 
         $0 = settings

@@ -29,7 +29,8 @@ while [[ $# -gt 0 ]]; do
 done
 
 build_linux() {
-    local scratch='.build/release'
+    local scratch='.build.xcode'
+    local release="${scratch}/release"
 
     for product in "${products[@]}"; do
         BUILD_LIBRARY_AS_BINARY='true' \
@@ -48,12 +49,12 @@ build_linux() {
             "Modules/${product}.swiftinterface" \
             "Modules/${product}.swiftdoc" \
             "lib${product}.so"; do
-            if [[ ! -f "${scratch}/${file}" ]]; then
+            if [[ ! -f "${release}/${file}" ]]; then
                 echo "Error: ${file} not found in build output"
                 exit 1
             fi
 
-            cp -f "${scratch}/${file}" "${contents}/${file}"
+            cp -f "${release}/${file}" "${contents}/${file}"
         done
 
         chmod +x "${contents}/lib${product}.so"
