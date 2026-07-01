@@ -42,7 +42,7 @@ build_linux() {
     for product in "${products[@]}"; do
         local xcframework="${BUILD_XCFRAMEWORKS_DESTINATION}/${product}.xcframework"
         local contents="${xcframework}/linux-$(uname -m)"
-        mkdir -p "$contents"
+        mkdir -p "$contents/Modules"
 
         for file in \
             "Modules/${product}.swiftinterface" \
@@ -58,8 +58,10 @@ build_linux() {
 
         chmod +x "${contents}/lib${product}.so"
 
-        cat Scripts/Build/Into.plist.template | \
-        sed "s/__LIBRARY__/${product}/g" > "${xcframework}/Info.plist"
+        cat Scripts/Info.plist.template | \
+        sed \
+            -e "s/__LIBRARY__/${product}/g" \
+            -e "s/__ARCHITECTURE__/$(uname -m)/g" > "${xcframework}/Info.plist"
     done
 }
 
@@ -97,7 +99,7 @@ build_macOS() {
             # if building for local development, include sourcemaps
             local sourceinfo_prefix="${ArchiveIntermediates}/${BUILD_ANCHOR}/IntermediateBuildFilesPath"
             local sourceinfo="/Release/${product}.build/Objects-normal/arm64/${product}.swiftsourceinfo"
-            local sourceinfo=("${sourceinfo_prefix}"/package-ordo-*.build/"$sourceinfo")
+            local sourceinfo=("${sourceinfo_prefix}"/*.build/"$sourceinfo")
             local sourceinfo="${sourceinfo[0]}"
             if [[ -f "$sourceinfo" && "$BUILD_LOCAL" == 'true' ]]; then
                 cp "$sourceinfo" "${Modules}/${product}.swiftsourceinfo"

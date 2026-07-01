@@ -8,26 +8,12 @@
                 <key>BinaryPath</key>
                 <string>lib__LIBRARY__.so</string>
                 <key>LibraryIdentifier</key>
-                <string>linux-aarch64</string>
+                <string>linux-__ARCHITECTURE__</string>
                 <key>LibraryPath</key>
                 <string>lib__LIBRARY__.so</string>
                 <key>SupportedArchitectures</key>
                 <array>
-                    <string>aarch64</string>
-                </array>
-                <key>SupportedPlatform</key>
-                <string>linux</string>
-            </dict>
-            <dict>
-                <key>BinaryPath</key>
-                <string>lib__LIBRARY__.so</string>
-                <key>LibraryIdentifier</key>
-                <string>linux-x86_64</string>
-                <key>LibraryPath</key>
-                <string>lib__LIBRARY__.so</string>
-                <key>SupportedArchitectures</key>
-                <array>
-                    <string>x86_64</string>
+                    <string>__ARCHITECTURE__</string>
                 </array>
                 <key>SupportedPlatform</key>
                 <string>linux</string>
