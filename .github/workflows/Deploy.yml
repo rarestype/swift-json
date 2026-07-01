@@ -17,36 +17,7 @@ on:
                 type: string
 
 jobs:
-    macOS:
-        runs-on: macos-26
-        env:
-            DEPLOY_VERSION: ${{ inputs.version }}
-        steps:
-            -   name: 💝 Setup R2 💝
-                uses: rarestype/r2-setup-action@v1
-                with:
-                    cloudflare-account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-                    r2-access-key-id: ${{ secrets.R2_ACCESS_KEY }}
-                    r2-access-key: ${{ secrets.R2_ACCESS_SECRET }}
-
-            -   name: 💝 Checkout repository 💝
-                uses: actions/checkout@v6
-
-            -   name: 💝 Select Xcode 26.5 💝
-                run: sudo xcode-select -s /Applications/Xcode_26.5.app/Contents/Developer
-
-            -   name: 💝 Build for distribution 💝
-                run: Scripts/Package
-
-            -   name: 💝 Deploy prebuilts 💝
-                uses: rarestype/r2-release-action@v1
-                with:
-                    from: .build/xcframeworks_
-                    include: JSON.xcframework
-                    archive: JSON.xcframework.zip
-                    version: ${{ inputs.version }}
-                    bucket: rarest
-    Linux:
+    build:
         strategy:
             matrix:
                 runner:
@@ -55,6 +26,9 @@ jobs:
 
                     -   name: "Ubuntu (aarch64)"
                         id: ubuntu-24.04-arm
+
+                    -   name: "macOS"
+                        id: macos-26
 
         runs-on: "${{ matrix.runner.id }}"
         name: "${{ matrix.runner.name }}"
@@ -72,9 +46,14 @@ jobs:
                 uses: actions/checkout@v6
 
             -   name: 💝 Install Swift 💝
+                if: runner.os != 'macOS'
                 uses: rarestype/swift-install-action@v1
                 with:
                     swift-release: 6.3.2-RELEASE
+
+            -   name: 💝 Select Xcode 26.5 💝
+                if: runner.os == 'macOS'
+                run: sudo xcode-select -s /Applications/Xcode_26.5.app/Contents/Developer
 
             -   name: 💝 Build for distribution 💝
                 run: Scripts/Package
@@ -83,13 +62,18 @@ jobs:
                 uses: rarestype/r2-release-action@v1
                 with:
                     from: .build/xcframeworks_
-                    include: JSON.xcframework
-                    archive: JSON.xcframework.zip
+                    each: zip
+                    include: |
+                        JSONAST.xcframework
+                        JSONDecoding.xcframework
+                        JSONEncoding.xcframework
+                        JSONParsing.xcframework
+                        JSON.xcframework
                     version: ${{ inputs.version }}
                     bucket: rarest
 
     release:
-        needs: [macOS, Linux]
+        needs: [build]
         runs-on: macos-26
         name: Release
         env:

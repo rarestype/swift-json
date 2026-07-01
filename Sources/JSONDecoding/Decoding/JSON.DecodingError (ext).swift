@@ -11,9 +11,9 @@ internal import TraceableErrors
 extension JSON.DecodingError: CustomStringConvertible {
     public var description: String { self.step.description }
 }
-extension JSON.DecodingError {
-    private var step: JSON.DecodingStepError {
-        if case let next as Self = self.underlying {
+extension JSON.DecodingError: DecodingErrorProtocol {
+    var step: JSON.DecodingStepError {
+        if case let next as any DecodingErrorProtocol = self.underlying {
             return .init(heading: self.heading, underlying: next.step)
         } else {
             return .init(heading: self.heading, underlying: self.underlying)
