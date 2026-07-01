@@ -134,6 +134,7 @@ jobs:
                             -e "s|__BUNDLE_URL_LINUX_AARCH64__|${BUNDLE_URL_LINUX_AARCH64}|g" \
                             Module.swift >> Package.swift
 
+                        rm *.zip
                     done
 
                     git config user.name "rarest automation"
