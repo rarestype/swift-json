@@ -144,8 +144,13 @@ package.targets = package.targets.map {
             settings.append(.treatWarning("MutableGlobalVariable", as: .error))
         }
         if  BuildLibraryAsBinary {
+            // we can also pass these via `-Xswiftc`, but then `swiftdoc` and `swiftinterface`
+            // will be in different locations, which makes packaging less convenient
             settings.append(
-                .unsafeFlags(["-enable-library-evolution", "-emit-module-interface"])
+                .unsafeFlags(
+                    ["-enable-library-evolution", "-emit-module-interface"],
+                    .when(platforms: [.linux])
+                )
             )
         } else {
             settings.append(.define("CANEXPOSE_TraceableErrors"))
