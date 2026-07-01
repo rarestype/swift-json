@@ -3,6 +3,9 @@
 /Benchmarks/Package.resolved
 /Benchmarks/*.json
 
+/Scripts/*/.build
+/Scripts/*/Package.resolved
+
 /.build
 /.build.*
 /.ssgc

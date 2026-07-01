@@ -1,4 +1,4 @@
-public import TraceableErrors
+internal import TraceableErrors
 
 extension JSON {
     /// An error occurred while decoding a document field.
@@ -24,10 +24,6 @@ extension JSON.DecodingError: Equatable where Location: Equatable {
         lhs.underlying ~= rhs.underlying
     }
 }
-extension JSON.DecodingError: TraceableError {
-    /// Returns a single note that says
-    /// `"while decoding value for field '_'"`.
-    public var notes: [String] {
-        ["while decoding value for field '\(self.location)'"]
-    }
+extension JSON.DecodingError {
+    var heading: String { "while decoding value for field '\(self.location)'" }
 }

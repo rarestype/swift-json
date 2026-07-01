@@ -1,3 +1,5 @@
+internal import JSONDecoding
+
 extension JSON {
     struct UnkeyedDecoder {
         public let codingPath: [any CodingKey]
