@@ -95,22 +95,33 @@ build_macOS() {
             local Modules="${xcarchive}/Products/Library/Frameworks/${product}.framework/Modules"
             local Release="${ArchiveIntermediates}/${BUILD_ANCHOR}/BuildProductsPath/Release"
 
-            mkdir -p "${Modules}/${product}.swiftmodule"
-
-            # if building for local development, include sourcemaps
-            local sourceinfo_prefix="${ArchiveIntermediates}/${BUILD_ANCHOR}/IntermediateBuildFilesPath"
-            local sourceinfo="/Release/${product}.build/Objects-normal/arm64/${product}.swiftsourceinfo"
-            local sourceinfo=("${sourceinfo_prefix}"/*.build"$sourceinfo")
-            local sourceinfo="${sourceinfo[0]}"
-            if [[ -f "$sourceinfo" && "$BUILD_LOCAL" == 'true' ]]; then
-                cp "$sourceinfo" "${Modules}/${product}.swiftsourceinfo"
-            fi
-            for resource in 'swiftdoc' 'swiftinterface'; do
-                local expected="${product}.swiftmodule/arm64-apple-macos.${resource}"
-                if [ -f "${Release}/${expected}" ]; then
-                    cp  "${Release}/${expected}" \
-                        "${Modules}/${expected}"
+            local modules=()
+            for module in "${Release}"/*.swiftmodule; do
+                if [[ -d "$module" ]]; then
+                    local module_name="${module##*/}"
+                    modules+=("${module_name%.swiftmodule}")
                 fi
+            done
+
+            echo "discovered modules: ${modules[*]}"
+
+            for module in "${modules[@]}"; do
+                mkdir -p "${Modules}/${module}.swiftmodule"
+                # if building for local development, include sourcemaps
+                local sourceinfo_prefix="${ArchiveIntermediates}/${BUILD_ANCHOR}/IntermediateBuildFilesPath"
+                local sourceinfo="/Release/${module}.build/Objects-normal/arm64/${module}.swiftsourceinfo"
+                local sourceinfo=("${sourceinfo_prefix}"/*.build"$sourceinfo")
+                local sourceinfo="${sourceinfo[0]}"
+                if [[ -f "$sourceinfo" && "$BUILD_LOCAL" == 'true' ]]; then
+                    cp "$sourceinfo" "${Modules}/${module}.swiftsourceinfo"
+                fi
+                for resource in 'swiftdoc' 'swiftinterface'; do
+                    local expected="${module}.swiftmodule/arm64-apple-macos.${resource}"
+                    if [ -f "${Release}/${expected}" ]; then
+                        cp  "${Release}/${expected}" \
+                            "${Modules}/${expected}"
+                    fi
+                done
             done
         done
     done

@@ -8,7 +8,7 @@ let package: Package = .init(
     products: [
         .library(name: "JavaScriptPersistence", targets: ["JavaScriptPersistence"]),
         .library(name: "JQ", targets: ["JQ"]),
-        .library(name: "JSON", targets: ["JSON"]),
+        .library(name: "JSON", type: BuildLibraryAsBinary ? .dynamic : nil, targets: ["JSON"]),
         .library(name: "JSONAST", targets: ["JSONAST"]),
         .library(name: "JSONLegacy", targets: ["JSONLegacy"]),
 
@@ -120,13 +120,6 @@ var BuildLibraryAsBinary: Bool {
     }
 }
 
-package.products = package.products.map {
-    if case let library as Product.Library = $0, BuildLibraryAsBinary {
-        return .library(name: $0.name, type: .dynamic, targets: library.targets)
-    } else {
-        return $0
-    }
-}
 package.targets = package.targets.map {
     switch $0.type {
     case .plugin: return $0
