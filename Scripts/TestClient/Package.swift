@@ -26,5 +26,5 @@ let package: Package = .init(
 )
 
 func binary(name: String) -> Target {
-    return .binaryTarget(name: name, path: "../../.build/xcframeworks_/\(name).xcframework.zip")
+    return .binaryTarget(name: name, path: "../../.build/xcframeworks_/\(name).xcframework")
 }

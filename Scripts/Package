@@ -51,12 +51,10 @@ build_linux() {
         cp -f "${release}/${library}" "${contents}/${library}"
 
         local module="$product"
-        local swiftmodule="${contents}/Modules/${module}.swiftmodule"
-        mkdir -p "$swiftmodule"
         for resource in 'swiftinterface' 'swiftdoc'; do
             local file="${module}.${resource}"
-            if [[ -f "${release}/${module}.build/${file}" ]]; then
-                cp -f "${release}/${module}.build/${file}" "${swiftmodule}/${file}"
+            if [[ -f "${release}/Modules/${file}" ]]; then
+                cp -f "${release}/Modules/${file}" "${contents}/${file}"
             fi
         done
 
@@ -158,7 +156,8 @@ fi
 
 if [[ -d Scripts/TestClient ]]; then
     echo "💞 testing xcframeworks consumption"
-    swift build --package-path Scripts/TestClient
+
+    swift build --package-path Scripts/TestClient --experimental-xcframeworks-on-linux
 fi
 
 echo "💖 built xcframeworks at path: ${BUILD_XCFRAMEWORKS_DESTINATION}"
