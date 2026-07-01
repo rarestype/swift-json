@@ -143,6 +143,9 @@ package.targets = package.targets.map {
             settings.append(.treatWarning("ExistentialAny", as: .error))
             settings.append(.treatWarning("MutableGlobalVariable", as: .error))
         }
+        if  BuildLibraryAsBinary {
+            settings.append(.unsafeFlags(["-emit-module-interface"]))
+        }
 
         $0 = settings
     } (&$0.swiftSettings)
