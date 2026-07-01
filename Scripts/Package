@@ -147,13 +147,6 @@ else
     build_linux
 fi
 
-(
-    cd "$BUILD_XCFRAMEWORKS_DESTINATION"
-    for xcframework in *.xcframework; do
-        zip --symlinks -rq "${xcframework}.zip" "$xcframework"
-    done
-)
-
 if [[ -d Scripts/TestClient ]]; then
     echo "💞 testing xcframeworks consumption"
 
