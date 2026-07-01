@@ -143,11 +143,7 @@ package.targets = package.targets.map {
             settings.append(.treatWarning("ExistentialAny", as: .error))
             settings.append(.treatWarning("MutableGlobalVariable", as: .error))
         }
-        if  BuildLibraryAsBinary {
-            settings.append(
-                .unsafeFlags(["-enable-library-evolution", "-emit-module-interface"])
-            )
-        } else {
+        if !BuildLibraryAsBinary {
             settings.append(.define("CANEXPOSE_TraceableErrors"))
         }
 
