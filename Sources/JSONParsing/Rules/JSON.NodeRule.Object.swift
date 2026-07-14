@@ -5,7 +5,7 @@ extension JSON.NodeRule {
     ///
     /// Object literals begin and end with curly braces (`{` and `}`), and
     /// contain instances of ``Item`` separated by ``JSON.CommaRule``s.
-    /// Trailing commas are not allowed.
+    /// In standard JSON, trailing commas are not allowed.
     enum Object {}
 }
 extension JSON.NodeRule.Object: ParsingRule {
@@ -16,17 +16,23 @@ extension JSON.NodeRule.Object: ParsingRule {
     ) throws(PatternMatchingError) -> [(key: JSON.Key, value: JSON.Node)]
         where Source.Index == Location, Source.Element == Terminal {
         try input.parse(as: JSON.BraceLeftRule<Location>.self)
-        var items: [(key: JSON.Key, value: JSON.Node)]
-        if let head: (key: JSON.Key, value: JSON.Node) = try? input.parse(as: Item.self) {
-            items = [head]
-            while   let (_, next): (Void, (key: JSON.Key, value: JSON.Node)) = try? input.parse(
-                    as: (JSON.CommaRule<Location>, Item).self
-                ) {
-                items.append(next)
+
+        var items: [(key: JSON.Key, value: JSON.Node)] = []
+        var json5: Bool = false
+
+        while let next: (key: JSON.Key, value: JSON.Node) = input.parse(as: Item?.self) {
+            items.append(next)
+
+            guard case ()? = input.parse(as: JSON.CommaRule<Location>?.self) else {
+                json5 = false
+                break
             }
-        } else {
-            items = []
+
+            json5 = true
         }
+
+        _ = json5
+
         try input.parse(as: JSON.BraceRightRule<Location>.self)
         return items
     }
