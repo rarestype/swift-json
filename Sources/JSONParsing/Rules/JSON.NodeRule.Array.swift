@@ -17,11 +17,16 @@ extension JSON.NodeRule.Array: ParsingRule {
         where Source.Element == Terminal, Source.Index == Location {
         try input.parse(as: JSON.BracketLeftRule<Location>.self)
 
-        var elements: [JSON.Node] = []
+        var elements: [JSON.Node]? = nil
         var json5: Bool = false
 
         while let next: JSON.Node = input.parse(as: JSON.NodeRule<Location>?.self) {
-            elements.append(next)
+            if var allocated: [JSON.Node] = consume elements {
+                allocated.append(next)
+                elements = allocated
+            } else {
+                elements = [next]
+            }
 
             guard case ()? = input.parse(as: JSON.CommaRule<Location>?.self) else {
                 json5 = false
@@ -34,6 +39,6 @@ extension JSON.NodeRule.Array: ParsingRule {
         _ = json5
 
         try input.parse(as: JSON.BracketRightRule<Location>.self)
-        return elements
+        return elements ?? []
     }
 }
