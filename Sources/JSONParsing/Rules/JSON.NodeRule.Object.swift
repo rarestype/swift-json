@@ -20,10 +20,10 @@ extension JSON.NodeRule.Object: ParsingRule {
         var items: [(key: JSON.Key, value: JSON.Node)] = []
         var json5: Bool = false
 
-        while let next: (key: JSON.Key, value: JSON.Node) = try? input.parse(as: Item.self) {
+        while let next: (key: JSON.Key, value: JSON.Node) = input.parse(as: Item?.self) {
             items.append(next)
 
-            guard case ()? = try? input.parse(as: JSON.CommaRule<Location>.self) else {
+            guard case ()? = input.parse(as: JSON.CommaRule<Location>?.self) else {
                 json5 = false
                 break
             }
