@@ -15,8 +15,7 @@ extension JSON.NodeRule.Object.Item: ParsingRule {
     ) throws(PatternMatchingError) -> (
         key: JSON.Key,
         value: JSON.Node
-    )
-        where Source.Index == Location, Source.Element == Terminal {
+    ) where Source.Index == Location, Source.Element == Terminal {
         let key: String  = try input.parse(as: JSON.StringRule<Location>.self)
         try input.parse(as: JSON.ColonRule<Location>.self)
         let value: JSON.Node  = try input.parse(as: JSON.NodeRule<Location>.self)

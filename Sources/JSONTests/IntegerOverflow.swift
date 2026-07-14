@@ -79,8 +79,10 @@ import Testing
     }
 }
 extension IntegerOverflow {
-    private static func expect<Signed>(_ value: Int64, overflows: Signed.Type)
-        where Signed: SignedInteger & JSONDecodable {
+    private static func expect<Signed>(
+        _ value: Int64,
+        overflows: Signed.Type
+    ) where Signed: SignedInteger & JSONDecodable {
         let field: JSON.FieldDecoder<Never?> = .init(
             key: nil,
             value: .number(value)
@@ -102,8 +104,10 @@ extension IntegerOverflow {
         #expect(try field.decode() == value)
     }
 
-    private static func expect<Unsigned>(_ value: UInt64, overflows: Unsigned.Type)
-        where Unsigned: UnsignedInteger & JSONDecodable {
+    private static func expect<Unsigned>(
+        _ value: UInt64,
+        overflows: Unsigned.Type
+    ) where Unsigned: UnsignedInteger & JSONDecodable {
         let field: JSON.FieldDecoder<Never?> = .init(
             key: nil,
             value: .number(.init(value))
