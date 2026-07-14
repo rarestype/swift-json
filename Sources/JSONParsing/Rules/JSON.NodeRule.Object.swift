@@ -20,21 +20,20 @@ extension JSON.NodeRule.Object: ParsingRule {
         var items: [(key: JSON.Key, value: JSON.Node)] = []
         var json5: Bool = false
 
-        while case nil = input.parse(as: JSON.BraceRightRule<Location>?.self) {
-
-            items.append(try input.parse(as: Item.self))
+        while let next: (key: JSON.Key, value: JSON.Node) = input.parse(as: Item?.self) {
+            items.append(next)
 
             guard case ()? = input.parse(as: JSON.CommaRule<Location>?.self) else {
-                // no comma, so it's not JSON5
-                try input.parse(as: JSON.BraceRightRule<Location>.self)
                 json5 = false
                 break
             }
 
             json5 = true
         }
+
         _ = json5
 
+        try input.parse(as: JSON.BraceRightRule<Location>.self)
         return items
     }
 }

@@ -20,13 +20,10 @@ extension JSON.NodeRule.Array: ParsingRule {
         var elements: [JSON.Node] = []
         var json5: Bool = false
 
-        while case nil = input.parse(as: JSON.BracketRightRule<Location>?.self) {
-
-            elements.append(try input.parse(as: JSON.NodeRule<Location>.self))
+        while let next: JSON.Node = input.parse(as: JSON.NodeRule<Location>?.self) {
+            elements.append(next)
 
             guard case ()? = input.parse(as: JSON.CommaRule<Location>?.self) else {
-                // no comma, so it's not JSON5
-                try input.parse(as: JSON.BracketRightRule<Location>.self)
                 json5 = false
                 break
             }
@@ -36,6 +33,7 @@ extension JSON.NodeRule.Array: ParsingRule {
 
         _ = json5
 
+        try input.parse(as: JSON.BracketRightRule<Location>.self)
         return elements
     }
 }
