@@ -11,3 +11,8 @@ extension JSON: CustomStringConvertible {
         .init(decoding: self.utf8, as: UTF8.self)
     }
 }
+extension JSON {
+    @inline(always) @inlinable static func hex(_ remainder: UInt8) -> UInt8 {
+        remainder < 10 ? remainder + 0x30 : remainder + 0x37
+    }
+}

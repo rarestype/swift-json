@@ -18,6 +18,13 @@ extension JSON.Literal where Value: StringProtocol {
         for codeunit: UInt8 in self.value.utf8 {
             if  let code: JSON.EscapeCode = .init(escaping: codeunit) {
                 json.utf8 += code
+            } else if codeunit < 0x20 {
+                json.utf8.append(0x5C) // '\'
+                json.utf8.append(0x75) // 'u'
+                json.utf8.append(0x30) // '0'
+                json.utf8.append(0x30) // '0'
+                json.utf8.append(JSON.hex(codeunit >> 4))
+                json.utf8.append(JSON.hex(codeunit & 15))
             } else {
                 json.utf8.append(codeunit)
             }
