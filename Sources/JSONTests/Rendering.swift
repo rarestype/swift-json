@@ -8,9 +8,15 @@ import Testing
         #expect("\(expected)" == "\(try JSON.Node.init(parsingFragment: "\(expected)"))")
     }
 
-    @Test static func StringControlCharacters() throws {
+    @Test static func StringControlCharactersDLE() throws {
         let expected: JSON.Node = "\u{10}"
         #expect("\(expected)" == "\"\\u0010\"")
+        #expect("\(expected)" == "\(try JSON.Node.init(parsingFragment: "\(expected)"))")
+    }
+
+    @Test static func StringControlCharactersVT() throws {
+        let expected: JSON.Node = "\u{0B}"
+        #expect("\(expected)" == "\"\\u000B\"")
         #expect("\(expected)" == "\(try JSON.Node.init(parsingFragment: "\(expected)"))")
     }
 }

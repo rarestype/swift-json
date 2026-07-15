@@ -23,8 +23,8 @@ extension JSON.Literal where Value: StringProtocol {
                 json.utf8.append(0x75) // 'u'
                 json.utf8.append(0x30) // '0'
                 json.utf8.append(0x30) // '0'
-                json.utf8.append(0x30 + codeunit >> 4)
-                json.utf8.append(0x30 + codeunit & 15)
+                json.utf8.append(JSON.hex(codeunit >> 4))
+                json.utf8.append(JSON.hex(codeunit & 15))
             } else {
                 json.utf8.append(codeunit)
             }
