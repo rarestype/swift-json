@@ -108,6 +108,23 @@ jobs:
                 with:
                     swift-release: 6.3.2-RELEASE
 
+            -   name: 🩵 Install profiling libraries 🩵
+                run: |
+                    sudo apt install -y \
+                        libbabeltrace-dev \
+                        libelf-dev \
+                        libdw1 \
+                        libtraceevent-dev
+
+            -   name: 🩵 Install profiling tools 🩵
+                uses: rarestype/r2-install-action@v1
+                with:
+                    project: wasm-profile-exporter
+                    archive: perf.tar.gz
+
+            -   name: 🩵 Enable performance counters 🩵
+                run: sudo sysctl -w kernel.perf_event_paranoid=-1
+
             -   name: 🩵 Checkout repository 🩵
                 uses: actions/checkout@v6
 

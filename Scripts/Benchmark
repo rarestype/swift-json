@@ -13,3 +13,6 @@ swift build -c release \
     --package-path Benchmarks
 
 Benchmarks/.build/release/benchmark "Benchmarks/${subject}" > ${subject}.duration
+
+which perf
+perf record -F 8000 -g -- Benchmarks/.build/release/benchmark Benchmarks/Swift.symbols.json
