@@ -16,18 +16,29 @@ extension JSON.NodeRule.Array: ParsingRule {
     ) throws(PatternMatchingError) -> [JSON.Node]
         where Source.Element == Terminal, Source.Index == Location {
         try input.parse(as: JSON.BracketLeftRule<Location>.self)
-        var elements: [JSON.Node]
-        if let head: JSON.Node = try? input.parse(as: JSON.NodeRule<Location>.self) {
-            elements = [head]
-            while   let (_, next): (Void, JSON.Node) = try? input.parse(
-                    as: (JSON.CommaRule<Location>, JSON.NodeRule<Location>).self
-                ) {
-                elements.append(next)
+
+        var elements: [JSON.Node]? = nil
+        var json5: Bool = false
+
+        while let next: JSON.Node = input.parse(as: JSON.NodeRule<Location>?.self) {
+            if var allocated: [JSON.Node] = consume elements {
+                allocated.append(next)
+                elements = allocated
+            } else {
+                elements = [next]
             }
-        } else {
-            elements = []
+
+            guard case ()? = input.parse(as: JSON.CommaRule<Location>?.self) else {
+                json5 = false
+                break
+            }
+
+            json5 = true
         }
+
+        _ = json5
+
         try input.parse(as: JSON.BracketRightRule<Location>.self)
-        return elements
+        return elements ?? []
     }
 }
