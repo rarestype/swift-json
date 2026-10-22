@@ -20,18 +20,18 @@ jobs:
     build:
         strategy:
             matrix:
-                runner:
+                platform:
                     -   name: "Ubuntu (x86_64)"
-                        id: ubuntu-24.04
+                        runs-on: ubuntu-24.04
 
                     -   name: "Ubuntu (aarch64)"
-                        id: ubuntu-24.04-arm
+                        runs-on: ubuntu-24.04-arm
 
                     -   name: "macOS"
-                        id: macos-26
+                        runs-on: xcode-27
 
-        runs-on: "${{ matrix.runner.id }}"
-        name: "${{ matrix.runner.name }}"
+        runs-on: ${{ matrix.platform['runs-on'] }}
+        name: ${{ matrix.platform.name }}
         env:
             DEPLOY_VERSION: ${{ inputs.version }}
         steps:
@@ -49,11 +49,11 @@ jobs:
                 if: runner.os != 'macOS'
                 uses: rarestype/swift-install-action@v1
                 with:
-                    swift-release: 6.3.3-RELEASE
+                    swift-release: 6.4.1-RELEASE
 
-            -   name: 💝 Select Xcode 26.6 💝
+            -   name: 💝 Select Xcode 27.1 💝
                 if: runner.os == 'macOS'
-                run: sudo xcode-select -s /Applications/Xcode_26.6.app/Contents/Developer
+                run: sudo xcode-select -s /Applications/Xcode_27.1.app/Contents/Developer
 
             -   name: 💝 Build for distribution 💝
                 run: Scripts/Package
@@ -74,7 +74,7 @@ jobs:
 
     release:
         needs: [build]
-        runs-on: macos-26
+        runs-on: xcode-27
         name: Release
         env:
             DEPLOY_VERSION: ${{ inputs.version }}
