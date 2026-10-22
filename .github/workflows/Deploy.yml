@@ -51,9 +51,9 @@ jobs:
                 with:
                     swift-release: 6.4.1-RELEASE
 
-            -   name: 💝 Select Xcode 27.1 💝
+            -   name: 💝 Select Xcode 27.2 💝
                 if: runner.os == 'macOS'
-                run: sudo xcode-select -s /Applications/Xcode_27.1.app/Contents/Developer
+                run: sudo xcode-select -s /Applications/Xcode_27.2.app/Contents/Developer
 
             -   name: 💝 Build for distribution 💝
                 run: Scripts/Package
