@@ -86,21 +86,21 @@ jobs:
     benchmarks:
         strategy:
             matrix:
-                runner:
-                    -   id: ubuntu-24.04
-                        arch: x86_64
-                    -   id: ubuntu-24.04-arm
-                        arch: aarch64
+                platform:
+                    -   arch: x86_64
+                        runs-on: ubuntu-24.04
+                    -   arch: aarch64
+                        runs-on: ubuntu-24.04-arm
 
-        runs-on: ${{ matrix.runner.id }}
-        name: Benchmark (${{ matrix.runner.arch }})
+        runs-on: ${{ matrix.platform['runs-on'] }}
+        name: Benchmark (${{ matrix.platform.arch }})
         needs: changes
         if: needs.changes.outputs.code_changed == 'true' && github.event_name == 'pull_request'
         steps:
             -   name: 🩵 Install Swift 🩵
                 uses: rarestype/swift-install-action@v1
                 with:
-                    swift-release: 6.3.3-RELEASE
+                    swift-release: 6.4.1-RELEASE
 
             -   name: 🩵 Checkout repository 🩵
                 uses: actions/checkout@v6
@@ -111,7 +111,7 @@ jobs:
             -   name: 🩵 Upload benchmark timings 🩵
                 uses: actions/upload-artifact@v7
                 with:
-                    name: timings-${{ matrix.runner.arch }}
+                    name: timings-${{ matrix.platform.arch }}
                     path: '*.duration'
                     retention-days: 1
                     compression-level: 0
