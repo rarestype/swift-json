@@ -72,7 +72,7 @@ extension JSObject {
         }
         set(value) {
             if  self.buffer.endIndex < index {
-                let count: Int = index.distance(to: self.buffer.endIndex)
+                let count: Int = self.buffer.endIndex.distance(to: index)
                 self.buffer.append(contentsOf: repeatElement(.undefined, count: count))
                 self.buffer.append(value)
             } else if
