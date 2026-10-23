@@ -55,6 +55,17 @@ build_linux() {
             local file="${module}.${resource}"
             if [[ -f "${release}/Modules/${file}" ]]; then
                 cp -f "${release}/Modules/${file}" "${contents}/${file}"
+            else
+                local matches=(
+                    "${scratch}"/out/Intermediates.noindex/*/*/"${module}"-t.build/Objects-normal/*/"${file}" \
+                    "${scratch}"/out/Intermediates.noindex/*/*/"${module}"-t.build/Objects-normal/*/Modules/"${file}"
+                )
+                for match in "${matches[@]}"; do
+                    if [[ -f "$match" ]]; then
+                        cp -f "$match" "${contents}/${file}"
+                        break
+                    fi
+                done
             fi
         done
 
@@ -150,7 +161,11 @@ fi
 if [[ -d Scripts/TestClient ]]; then
     echo "💞 testing xcframeworks consumption"
 
-    swift build --package-path Scripts/TestClient --experimental-xcframeworks-on-linux
+    if [[ $(uname) == "Darwin" ]]; then
+        swift build --package-path Scripts/TestClient --experimental-xcframeworks-on-linux
+    else
+        swift build --package-path Scripts/TestClient --experimental-xcframeworks-on-linux --build-system native
+    fi
 fi
 
 echo "💖 built xcframeworks at path: ${BUILD_XCFRAMEWORKS_DESTINATION}"
