@@ -96,6 +96,12 @@ let package: Package = .init(
                 .target(name: "JQ"),
             ]
         ),
+        .testTarget(
+            name: "JavaScriptPersistenceTests",
+            dependencies: [
+                .target(name: "JavaScriptPersistence"),
+            ]
+        ),
 
 
         .target(
