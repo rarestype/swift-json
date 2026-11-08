@@ -6,8 +6,7 @@ enum MarketType: String {
     case future
 }
 //  snippet.MARKETTYPE_DECODABLE
-extension MarketType: JSONDecodable {
-}
+extension MarketType: JSONDecodable {}
 //  snippet.MARKET
 struct Market {
     let name: String
@@ -49,7 +48,9 @@ func decode(message: String) throws -> Market {
     // snippet.end
 }
 // snippet.MAIN_CALL
-print(try decode(message: """
+print(
+    try decode(
+        message: """
         {
             "market": {
                 "name": "BTC-PERP",
@@ -57,13 +58,19 @@ print(try decode(message: """
                 "perpetual": true
             }
         }
-        """))
+        """
+    )
+)
 
-print(try decode(message: """
+print(
+    try decode(
+        message: """
         {
             "market": {
                 "name": "BTC-PERP",
                 "type": "spot"
             }
         }
-        """))
+        """
+    )
+)
