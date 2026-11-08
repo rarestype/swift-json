@@ -7,8 +7,7 @@ extension JSON {
         case undefined(CodingKey)
     }
 }
-extension JSON.ObjectKeyError: Equatable where CodingKey: Equatable {
-}
+extension JSON.ObjectKeyError: Equatable where CodingKey: Equatable {}
 extension JSON.ObjectKeyError: CustomStringConvertible {
     public var description: String {
         switch self {
