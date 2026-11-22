@@ -123,8 +123,7 @@ extension JSON.KeyedDecoder: KeyedDecodingContainerProtocol {
     }
     public func nestedUnkeyedContainer(forKey key: Key) throws -> any UnkeyedDecodingContainer {
         let path: [any CodingKey] = self.codingPath + CollectionOfOne<any CodingKey>.init(key)
-        let container: JSON.UnkeyedDecoder =
-        .init(try self.diagnose(key, \.array), path: path)
+        let container: JSON.UnkeyedDecoder = .init(try self.diagnose(key, \.array), path: path)
         return container as any UnkeyedDecodingContainer
     }
     public func nestedContainer<NestedKey>(
@@ -132,8 +131,10 @@ extension JSON.KeyedDecoder: KeyedDecodingContainerProtocol {
         forKey key: Key
     ) throws -> KeyedDecodingContainer<NestedKey> {
         let path: [any CodingKey] = self.codingPath + CollectionOfOne<any CodingKey>.init(key)
-        let container: JSON.KeyedDecoder<NestedKey> =
-        .init(try .init(indexing: try self.diagnose(key, \.object)), path: path)
+        let container: JSON.KeyedDecoder<NestedKey> = .init(
+            try .init(indexing: try self.diagnose(key, \.object)),
+            path: path
+        )
         return .init(container)
     }
 }
