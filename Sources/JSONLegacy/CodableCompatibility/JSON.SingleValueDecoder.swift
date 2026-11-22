@@ -51,8 +51,10 @@ extension JSON.SingleValueDecoder: Decoder {
     }
     public func container<Key>(keyedBy _: Key.Type) throws -> KeyedDecodingContainer<Key>
         where Key: CodingKey {
-        let container: JSON.KeyedDecoder<Key> =
-        .init(try .init(indexing: try self.diagnose(\.object)), path: self.codingPath)
+        let container: JSON.KeyedDecoder<Key> = .init(
+            try .init(indexing: try self.diagnose(\.object)),
+            path: self.codingPath
+        )
         return .init(container)
     }
 }
