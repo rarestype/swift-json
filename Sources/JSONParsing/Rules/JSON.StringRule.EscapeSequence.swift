@@ -26,10 +26,10 @@ extension JSON.StringRule.EscapeSequence: ParsingRule {
             } else {
                 try input.parse(as: ASCII.LowercaseU.self)
                 let value: UInt16 =
-                (try input.parse(as: HexDigit.self) << 12) |
-                (try input.parse(as: HexDigit.self) <<  8) |
-                (try input.parse(as: HexDigit.self) <<  4) |
-                (try input.parse(as: HexDigit.self))
+                    (try input.parse(as: HexDigit.self) << 12) |
+                    (try input.parse(as: HexDigit.self) <<  8) |
+                    (try input.parse(as: HexDigit.self) <<  4) |
+                    (try input.parse(as: HexDigit.self))
                 if let scalar: Unicode.Scalar = Unicode.Scalar.init(value) {
                     unescaped.append(Character.init(scalar))
                 } else {
